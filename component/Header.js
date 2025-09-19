@@ -9,6 +9,7 @@ const Header = () => {
   const [results, setResults] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [loadingAnimation, setLoadingAnimation] = useState(true);
 
   const fetchMovies = async (query, pageNumber) => {
     try {
@@ -63,6 +64,22 @@ const Header = () => {
     </div>
   );
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingAnimation(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loadingAnimation) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen gap-3">
+        <div className="h-12 w-12 border-3 border-gray-200 rounded-full border-t-blue-500 animate-spin"></div>
+        <span className="ml-4 text-lg text-white">loading...</span>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Navbar */}
@@ -76,13 +93,13 @@ const Header = () => {
       {/* Display Results */}
       <div className="bg-[#18181b] py-3">
         {loading ? (
-          <div className="cards grid gap-6 px-5 lg:mx-20 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="cards grid gap-8 p-5 lg:mx-30 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {Array.from({ length: 10 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
           </div>
         ) : results && results.length > 0 ? (
-          <div className="card grid gap-6 px-5 lg:mx-20 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 ">
+          <div className="card grid gap-8 p-5 lg:mx-30 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 ">
             {results.map((item, index) => (
               <Link
                 href={`/movie/${item.imdbID}`}
@@ -93,7 +110,7 @@ const Header = () => {
                   <img
                     width={200}
                     height={300}
-                    src={item.Poster !== "N/A"? item.Poster : "/noposter.jpg"}
+                    src={item.Poster !== "N/A" ? item.Poster : "/noposter.jpg"}
                     alt={`${item.Title} Poster`}
                     className="rounded-t-lg w-full object-cover aspect-2/3"
                   />

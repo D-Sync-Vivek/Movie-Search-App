@@ -1,5 +1,5 @@
 import React from "react";
-
+import Link from "next/link";
 const page = async ({ params }) => {
   let movieData = null;
   try {
@@ -25,7 +25,7 @@ const page = async ({ params }) => {
       {movieData ? (
         <>
           <div className="grid md:grid-cols-2 justify-center items-center min-h-screen bg-[#18181b] overflow-hidden">
-            <div className="poster flex justify-end mx-auto my-7">
+            <div className="poster flex justify-end mx-auto my-5">
               <img
                 src={
                   movieData.Poster && movieData.Poster !== "N/A"
@@ -33,12 +33,12 @@ const page = async ({ params }) => {
                     : "/noposter.jpg"
                 }
                 alt={`${movieData.Title} Poster`}
-                className="p-2 rounded-2xl h-[500px] object-cover"
+                className="border border-gray-600 shadow-2xl shadow-gray-800 rounded-2xl h-[500px] object-cover"
               />
             </div>
             {/* Movie Information */}
             <div className=" mx-auto rounded-r-lg px-5">
-              <div className="text-white p-2 rounded-r-lg h-[500px]">
+              <div className="text-white p-2 rounded-r-lg flex flex-col justify-center my-5">
                 {/* Movie Title */}
                 <span className="Title">
                   <h2 className="text-3xl font-bold ">{movieData.Title}</h2>
@@ -84,7 +84,7 @@ const page = async ({ params }) => {
                 </div>
 
                 {/* Movie's Runtime,Languages  */}
-                <p className="h-[0.5px] bg-gray-600 my-5"></p>
+                <p className="h-[1px] bg-gray-600 my-5"></p>
                 <div>
                   <span className="font-semibold">Duration: </span>
                   <span>{formatRuntime(movieData.Runtime)}</span>
