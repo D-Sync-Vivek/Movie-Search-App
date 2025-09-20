@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Link from "next/link";
 import Navbar from "./Navbar";
+import { useRef } from "react";
 
 const Header = () => {
   const [search, setSearch] = useState("");
@@ -11,6 +12,9 @@ const Header = () => {
   const [loading, setLoading] = useState(false);
   const [loadingAnimation, setLoadingAnimation] = useState(true);
 
+  const isInitialMount = useRef(true);
+
+  // fetch movies from OMDb
   const fetchMovies = async (query, pageNumber) => {
     try {
       setLoading(true);
@@ -30,13 +34,7 @@ const Header = () => {
     }
   };
 
-  // if user hasn't searched then show this.
-  useEffect(() => {
-    const defaults = ["Avengers", "Batman", "Harry Potter", "Boys"];
-    const random = defaults[Math.floor(Math.random() * defaults.length)];
-    fetchMovies(random, 1);
-  }, []);
-
+  // handle search submit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (search.trim() !== "") {
@@ -70,6 +68,54 @@ const Header = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, []);
+
+  // Restore state or fetch defaults (no scrolling here)
+  useEffect(() => {
+    const saved = sessionStorage.getItem("moviesState");
+    if (saved) {
+      const { search, results,scrollY, page, savedAt } = JSON.parse(saved);
+
+      // 10 minutes in milliseconds
+      const TEN_MINS = 10 * 60 * 1000;
+      if (Date.now() - savedAt > TEN_MINS) {
+        // expired -> remove storage and fetch defaults
+        sessionStorage.removeItem("moviesState");
+        const defaults = ["Avengers", "Batman", "Harry Potter", "Boys"];
+        const random = defaults[Math.floor(Math.random() * defaults.length)];
+        fetchMovies(random, 1);
+      } else {
+        // restore the previous state.
+        setSearch(search);
+        setResults(results);
+        setPage(page);
+        setTimeout(() => window.scrollTo(0, scrollY), 50);
+      }
+    } else {
+      const defaults = ["Avengers", "Batman", "Harry Potter", "Boys"];
+      const random = defaults[Math.floor(Math.random() * defaults.length)];
+      fetchMovies(random, 1);
+    }
+  }, []);
+
+  // Save to sessionStorage on state change (skip first mount and empty results)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (results.length === 0) return;
+
+    sessionStorage.setItem(
+      "moviesState",
+      JSON.stringify({
+        search,
+        results,
+        page,
+        scrollY: window.scrollY,
+        savedAt: Date.now(),
+      })
+    );
+  }, [search, results, page]);
 
   if (loadingAnimation) {
     return (
@@ -142,7 +188,9 @@ const Header = () => {
               }`}
               onClick={handleLoadMore}
             >
-              {loading ? "Loading..." : "Load More"}
+              <div className="hover:cursor-pointer">
+                {loading ? "Loading..." : "Load More"}
+              </div>
             </button>
           </div>
         </>
