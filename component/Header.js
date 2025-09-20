@@ -15,7 +15,7 @@ const Header = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${process.env.NEXT_PUBLIC_APIKEY}&s=${query}&page=${pageNumber}`
+        `https://www.omdbapi.com/?apikey=${process.env.NEXT_PUBLIC_APIKEY}&s=${query}&page=${pageNumber}`
       );
       const data = await res.json();
       if (data.Response === "True") {

@@ -5,7 +5,7 @@ const page = async ({ params }) => {
   try {
     const { id } = await params;
     const res = await fetch(
-      `http://www.omdbapi.com/?apikey=${process.env.NEXT_PUBLIC_APIKEY}&i=${id}`
+      `https://www.omdbapi.com/?apikey=${process.env.NEXT_PUBLIC_APIKEY}&i=${id}`
     );
     movieData = await res.json();
   } catch (error) {
